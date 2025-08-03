@@ -33,20 +33,20 @@ NC='\033[0m' # No Color
 LOGFILE="/var/log/rocky-hardening-$(date +%Y%m%d_%H%M%S).log"
 
 # Helper functions
-log() {
+log_success() {
     echo -e "${GREEN}[$(date '+%Y-%m-%d %H:%M:%S')] $1${NC}" | tee -a "$LOGFILE"
 }
 
-warn() {
+log_warning() {
     echo -e "${YELLOW}[$(date '+%Y-%m-%d %H:%M:%S')] WARNING: $1${NC}" | tee -a "$LOGFILE"
 }
 
-error() {
+log_error() {
     echo -e "${RED}[$(date '+%Y-%m-%d %H:%M:%S')] ERROR: $1${NC}" | tee -a "$LOGFILE"
     exit 1
 }
 
-info() {
+log_info() {
     echo -e "${BLUE}[$(date '+%Y-%m-%d %H:%M:%S')] $1${NC}" | tee -a "$LOGFILE"
 }
 
@@ -130,8 +130,8 @@ fi
 main() {
   # Get user input for customization
   echo
-  info "Starting Rocky Linux 9 hardening process..."
-  info "Log file: $LOGFILE"
+  log_info "Starting Rocky Linux 9 hardening process..."
+  log_info "Log file: $LOGFILE"
 
   check_root
 
@@ -171,7 +171,7 @@ main() {
         echo "Password: $USER_PASSWORD" >> /root/user_credentials.txt
         chmod 600 /root/user_credentials.txt
     else
-        log_warning "User $USER_NAME already exists"
+        inging "User $USER_NAME already exists"
     fi
     
     # Add user to wheel group for sudo without password
