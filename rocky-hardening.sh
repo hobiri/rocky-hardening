@@ -138,15 +138,13 @@ main() {
     # 1. System Update
     log_info "Step 1: Updating system packages"
     dnf update -y
-    dnf install -y dnf-automatic epel-release
+    dnf install -y dnf-automatic
     
     # Configure automatic security updates
     backup_file "/etc/dnf/automatic.conf"
     sed -i 's/^upgrade_type = .*/upgrade_type = security/' /etc/dnf/automatic.conf
     sed -i 's/^apply_updates = .*/apply_updates = yes/' /etc/dnf/automatic.conf
     systemctl enable --now dnf-automatic.timer
-    log_success "System updated and automatic security updates configured"
-
     log_success "System updated and automatic security updates configured"
 
     # 2. Create new unprivileged user
@@ -171,7 +169,7 @@ main() {
         echo "Password: $USER_PASSWORD" >> /root/user_credentials.txt
         chmod 600 /root/user_credentials.txt
     else
-        inging "User $USER_NAME already exists"
+        log_warning "User $USER_NAME already exists"
     fi
     
     # Add user to wheel group for sudo without password
@@ -192,13 +190,18 @@ main() {
     if ! grep -q "audit=1" /etc/default/grub; then
         sed -i "s/GRUB_CMDLINE_LINUX=\"/GRUB_CMDLINE_LINUX=\"$GRUB_SECURITY_PARAMS /" /etc/default/grub
         
-        # Rebuild GRUB configuration
-        if [[ -d /boot/efi/EFI/rocky ]]; then
-            grub2-mkconfig -o /boot/efi/EFI/rocky/grub.cfg
+        # Rebuild GRUB configuration - always use /boot/grub2/grub.cfg
+        # This avoids overwriting the GRUB wrapper in EFI systems
+        if grub2-mkconfig -o /boot/grub2/grub.cfg; then
+            log_success "Updated GRUB with security parameters"
         else
-            grub2-mkconfig -o /boot/grub2/grub.cfg
+            log_error "Failed to update GRUB configuration"
+            # Restore original grub file if backup exists
+            if [[ -f "/etc/default/grub.backup.$(date +%Y%m%d)_"* ]]; then
+                log_warning "Restoring original GRUB configuration"
+                cp /etc/default/grub.backup.* /etc/default/grub 2>/dev/null || true
+            fi
         fi
-        log_success "Updated GRUB with security parameters"
     fi
     
     # 4. Configure system security limits
@@ -255,7 +258,7 @@ EOF
     # 6. Configure password policies
     log_info "Step 6: Configuring password policies"
     backup_file "/etc/security/pwquality.conf"
-    cat > /etc/security/pwquality.d/50-hobiri-security.conf << 'EOF'
+    cat > /etc/security/pwquality.conf.d/50-hobiri-security.conf << 'EOF'
 # Password quality requirements
 minlen = 14
 minclass = 4
@@ -297,7 +300,7 @@ EOF
     
     groupadd "$SSH_USERS_GROUP" 2>/dev/null || true
     groupadd "$SFTP_USERS_GROUP" 2>/dev/null || true
-    usermod -aG "$SSH_USERS_GROUP" "$DEFAULT_USERNAME"
+    usermod -aG "$SSH_USERS_GROUP" "$USER_NAME"
 
     # Create SSH configuration in drop-in directory
     mkdir -p /etc/ssh/sshd_config.d
@@ -459,19 +462,61 @@ EOF
     # Configure CrowdSec
     systemctl enable --now crowdsec
     
-    # Configure nftables bouncer
-    if command -v cscli &> /dev/null; then
-        # Get bouncer API key
-        BOUNCER_KEY=$(cscli bouncers add nftables-bouncer -o raw 2>/dev/null || echo "")
-        
-        if [[ -n "$BOUNCER_KEY" ]]; then
-            # Configure bouncer
-            sed -i "s/api_key:.*/api_key: $BOUNCER_KEY/" /etc/crowdsec/bouncers/crowdsec-firewall-bouncer.yaml
-            systemctl enable --now crowdsec-firewall-bouncer
-            log_success "CrowdSec and nftables bouncer configured"
+    # Wait for CrowdSec to fully initialize
+    log_info "Waiting for CrowdSec to initialize..."
+    sleep 30
+    
+    # Check if CrowdSec is running
+    if systemctl is-active --quiet crowdsec; then
+        log_success "CrowdSec service is running"
+    else
+        log_warning "CrowdSec service may not be running properly"
+        systemctl status crowdsec --no-pager
+    fi
+
+    # Configure the nftables bouncer
+    # The bouncer should auto-register during installation
+    if systemctl enable crowdsec-firewall-bouncer; then
+        if systemctl start crowdsec-firewall-bouncer; then
+            sleep 5
+            if systemctl is-active --quiet crowdsec-firewall-bouncer; then
+                log_success "CrowdSec nftables bouncer is running successfully"
+                
+                # Verify bouncer registration
+                if command -v cscli &> /dev/null; then
+                    log_info "Checking bouncer registration:"
+                    cscli bouncers list 2>/dev/null || log_warning "Could not list bouncers"
+                fi
+            else
+                log_warning "CrowdSec bouncer failed to start"
+                log_info "Check bouncer logs with: journalctl -u crowdsec-firewall-bouncer -f"
+                systemctl status crowdsec-firewall-bouncer --no-pager
+            fi
         else
-            log_warning "Could not configure CrowdSec bouncer automatically"
+            log_warning "Failed to start CrowdSec bouncer service"
+            systemctl status crowdsec-firewall-bouncer --no-pager
         fi
+    else
+        log_warning "Failed to enable CrowdSec bouncer service"
+    fi
+    
+    # Install and update collections if cscli is available
+    if command -v cscli &> /dev/null; then
+        log_info "Installing CrowdSec security collections..."
+        
+        # Install common collections
+        cscli collections install crowdsecurity/sshd 2>/dev/null || log_info "SSH collection may already be installed"
+        cscli collections install crowdsecurity/linux 2>/dev/null || log_info "Linux collection may already be installed"
+        
+        # Update all collections
+        cscli collections upgrade 2>/dev/null || true
+        
+        # Reload CrowdSec to apply new collections
+        systemctl reload crowdsec 2>/dev/null || true
+        
+        log_success "CrowdSec collections installed and updated"
+    else
+        log_warning "CrowdSec CLI (cscli) not available yet"
     fi
     
     # 11. SELinux Configuration
