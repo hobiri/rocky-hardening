@@ -147,7 +147,7 @@ main() {
     systemctl enable --now dnf-automatic.timer
     log_success "System updated and automatic security updates configured"
 
-    log "System updated and automatic security updates configured"
+    log_success "System updated and automatic security updates configured"
 
     # 2. Create new unprivileged user
     log_info "Step 2: Creating new user '$USER_NAME'"
