@@ -1,0 +1,23 @@
+# macOS system files
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Thumbnails
+._*
+
+# macOS folder attributes
+Icon?
+.Spotlight-V100
+.Trashes
+
+# Shell script backup files
+*.bak
+*.swp
+*~
+
+# Logs
+*.log
+
+# VSCode settings (optional)
+.vscode/
