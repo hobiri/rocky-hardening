@@ -14,7 +14,6 @@
 
 set -euo pipefail
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 VERSION="1.0.0"
 
 # Load config and helpers once
@@ -87,21 +86,21 @@ main() {
 
     check_root
 
-    "$SCRIPT_DIR/steps/01-system-update.sh"
-    "$SCRIPT_DIR/steps/02-user-creation.sh"
-    "$SCRIPT_DIR/steps/03-kernel-hardening.sh"
-    "$SCRIPT_DIR/steps/04-system-limits.sh"
-    "$SCRIPT_DIR/steps/05-password-policy.sh"
-    "$SCRIPT_DIR/steps/06-pam-security.sh"
-    "$SCRIPT_DIR/steps/07-ssh-hardening.sh"
-    "$SCRIPT_DIR/steps/08-nft-firewall-configuration.sh"
-    "$SCRIPT_DIR/steps/09-crowdsec.sh"
-    "$SCRIPT_DIR/steps/10-selinux-enforcing.sh"
-    "$SCRIPT_DIR/steps/11-system-auditing.sh"
-    "$SCRIPT_DIR/steps/12-services-purge.sh"
-    "$SCRIPT_DIR/steps/13-secure-time-sync.sh"
-    "$SCRIPT_DIR/steps/14-filesystem-security.sh"
-    "$SCRIPT_DIR/steps/15-security-monitoring.sh"
+    ./steps/01-system-update.sh
+    ./steps/02-user-creation.sh
+    ./steps/03-kernel-hardening.sh
+    ./steps/04-system-limits.sh
+    ./steps/05-password-policy.sh
+    ./steps/06-pam-security.sh
+    ./steps/07-ssh-hardening.sh
+    ./steps/08-nft-firewall-configuration.sh
+    ./steps/09-crowdsec.sh
+    ./steps/10-selinux-enforcing.sh
+    ./steps/11-system-auditing.sh
+    ./steps/12-services-purge.sh
+    ./steps/13-secure-time-sync.sh
+    ./steps/14-filesystem-security.sh
+    ./steps/15-security-monitoring.sh
 
     # Final system configuration
     log_info "Step 99: Final system configuration and cleanup"

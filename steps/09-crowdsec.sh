@@ -13,8 +13,29 @@ source "${SCRIPT_DIR}/config.sh"
 source "${SCRIPT_DIR}/helpers.sh"
 
 # 9. CrowdSec Configuration
-log_info "Step 9: Installing CrowdSec"
+log_info "Step 9: Configuring CrowdSec"
 backup_file "/etc/crowdsec/config.yaml"
+
+# Function to check if CrowdSec is responsive
+check_crowdsec_ready() {
+    local timeout=30
+    local count=0
+    
+    while [ $count -lt $timeout ]; do
+        if cscli version &>/dev/null && systemctl is-active --quiet crowdsec; then
+            log_info "CrowdSec is ready and responsive"
+            
+            return 0
+        fi
+        
+        sleep 2
+        ((count += 2))
+    done
+    
+    log_error "CrowdSec failed to become ready within $timeout seconds"
+    
+    return 1
+}
 
 # Install CrowdSec repository
 RETRY_COUNT=3
@@ -31,3 +52,16 @@ for i in $(seq 1 $RETRY_COUNT); do
         sleep 10
     fi
 done
+
+# Install CrowdSec and nftables bouncer
+dnf install -y crowdsec crowdsec-firewall-bouncer-nftables
+
+# Configure CrowdSec
+systemctl enable --now crowdsec
+
+if ! systemctl start crowdsec; then
+    log_error "Failed to start CrowdSec service"
+    systemctl status crowdsec --no-pager
+elif ! check_crowdsec_ready; then
+    # noop
+fi
