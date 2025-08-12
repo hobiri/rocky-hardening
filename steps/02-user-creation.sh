@@ -29,6 +29,20 @@ USER_PASSWORD=$(generate_random_password)
 if ! id "$USER_NAME" &>/dev/null; then
     useradd -m -g "$USER_GROUP" -s /bin/bash "$USER_NAME"
     echo "$USER_NAME:$USER_PASSWORD" | chpasswd
+
+    if [[ -n "${USER_PUB_KEY:-}" ]]; then
+        user_ssh_dir="/home/$USER_NAME/.ssh"
+
+        mkdir -p "$user_ssh_dir"
+        
+        echo "$USER_PUB_KEY" > "$user_ssh_dir/authorized_keys"
+        
+        chmod 700 "$user_ssh_dir"
+        chmod 600 "$user_ssh_dir/authorized_keys"
+        chown -R "$USER_NAME:$USER_GROUP" "$user_ssh_dir"
+        
+        log_success "Added SSH public key for $USER_NAME"
+    fi
  
     log_success "Created user: $USER_NAME"
     log_success "Generated password: $USER_PASSWORD"
