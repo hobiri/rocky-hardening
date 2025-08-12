@@ -1,7 +1,7 @@
 # config.sh - Configuration file for Rocky Linux hardening script
 
-USER_NAME="admin"               # Default username
-USER_GROUP=""                   # User group, will use username if empty
+USER_NAME="admin"               # Username
+USER_GROUP=$USER_NAME           # User group
 IPV6="0"                        # Set to "1" to enable IPv6
 SSH_PORT="2222"                 # Default SSH port
 SSH_USERS_GROUP="ssh-users"     # Group for SSH users

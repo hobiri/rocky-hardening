@@ -76,7 +76,6 @@ kernel.kexec_load_disabled = 1
 kernel.kptr_restrict = 2
 kernel.perf_event_paranoid = 3
 kernel.unprivileged_bpf_disabled = 1
-
 # System Limits
 fs.file-max = 65535
 kernel.pid_max = 65535
