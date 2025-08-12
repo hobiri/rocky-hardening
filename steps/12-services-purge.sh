@@ -1,14 +1,16 @@
 #!/bin/bash
 set -euo pipefail
 
-if [[ ! -f "../config.sh" ]] || [[ ! -f "../helpers.sh" ]]; then
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+
+if [[ ! -f "${SCRIPT_DIR}/config.sh" ]] || [[ ! -f "${SCRIPT_DIR}/helpers.sh" ]]; then
     echo "Error: Required files not found. Run from script directory."
     exit 1
 fi
 
 # Load config and helpers once
-source ../config.sh
-source ../helpers.sh
+source "${SCRIPT_DIR}/config.sh"
+source "${SCRIPT_DIR}/helpers.sh"
 
 # 12. Disable unnecessary services
 log_info "Step 12: Disabling unnecessary services"
