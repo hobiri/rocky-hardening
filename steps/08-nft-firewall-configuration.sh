@@ -23,7 +23,7 @@ systemctl disable --now firewalld 2>/dev/null || true
 dnf install -y nftables
 
 # Create nftables configuration
-cat > /etc/nftables/main.nft << EOF
+cat > /etc/nftables/hobiri-security.nft << EOF
 #!/usr/sbin/nft -f
 
 flush ruleset
@@ -67,14 +67,25 @@ EOF
 
 log_info "Validating nftables configuration..."
 
-if nft -c -f /etc/nftables/main.nft; then
+if nft -c -f /etc/nftables/hobiri-security.nft; then
     log_success "nftables configuration is valid"
 else
     log_error "nftables configuration validation failed"
     exit 1
 fi
 
+# Ensure /etc/sysconfig/nftables.conf exists
+touch /etc/sysconfig/nftables.conf
+
+# Append include line if not already present
+if ! grep -Fxq 'include "/etc/nftables/hobiri-security.nft"' /etc/sysconfig/nftables.conf; then
+    echo 'include "/etc/nftables/hobiri-security.nft"' >> /etc/sysconfig/nftables.conf
+    log_info "Appended include line to /etc/sysconfig/nftables.conf"
+else
+    log_info "Include line already present in /etc/sysconfig/nftables.conf"
+fi
+
 # Set proper permissions and enable nftables
-chmod 755 /etc/nftables/main.nft
+chmod 755 /etc/nftables/hobiri-security.nft
 systemctl enable --now nftables
 log_success "nftables firewall configured and enabled"
