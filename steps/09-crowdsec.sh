@@ -64,6 +64,6 @@ systemctl enable --now crowdsec
 if ! systemctl start crowdsec; then
     log_error "Failed to start CrowdSec service"
     systemctl status crowdsec --no-pager
-elif ! check_crowdsec_ready; then
-    # noop
+else
+    check_crowdsec_ready
 fi

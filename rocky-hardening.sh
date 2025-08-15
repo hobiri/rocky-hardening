@@ -90,7 +90,7 @@ main() {
     ./steps/02-user-creation.sh
     ./steps/03-kernel-hardening.sh
     ./steps/04-system-limits.sh
-    ./steps/05-password-policy.sh
+    ./steps/05-password-policies.sh
     ./steps/06-pam-security.sh
     ./steps/07-ssh-hardening.sh
     ./steps/08-nft-firewall-configuration.sh

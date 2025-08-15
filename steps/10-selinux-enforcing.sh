@@ -16,7 +16,12 @@ source "${SCRIPT_DIR}/helpers.sh"
 log_info "Step 10: Configuring SELinux"
 
 # Ensure SELinux is enforcing
-setenforce 1
+if selinuxenabled; then
+    setenforce 1
+else
+    log_info "SELinux is not enabled; skipping setenforce."
+fi
+
 sed -i 's/SELINUX=permissive/SELINUX=enforcing/' /etc/selinux/config
 sed -i 's/SELINUX=disabled/SELINUX=enforcing/' /etc/selinux/config
 
