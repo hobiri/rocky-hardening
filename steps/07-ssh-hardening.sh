@@ -16,8 +16,8 @@ source "${SCRIPT_DIR}/helpers.sh"
 log_info "Step 7: Hardening SSH configuration"
 backup_file "/etc/ssh/sshd_config"
 
-groupadd "$SSH_USERS_GROUP" 2>/dev/null || true
-groupadd "$SFTP_USERS_GROUP" 2>/dev/null || true
+groupadd -gid 9999 "$SSH_USERS_GROUP" 2>/dev/null || true
+groupadd -gid 9998 "$SFTP_USERS_GROUP" 2>/dev/null || true
 usermod -aG "$SSH_USERS_GROUP" "$USER_NAME"
 
 # Create login banner

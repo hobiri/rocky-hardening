@@ -56,6 +56,8 @@ done
 # Install CrowdSec and nftables bouncer
 dnf install -y crowdsec crowdsec-firewall-bouncer-nftables
 
+# TODO: Be sure CrowdSec service starts after nftables
+
 # Configure CrowdSec
 systemctl enable --now crowdsec
 
