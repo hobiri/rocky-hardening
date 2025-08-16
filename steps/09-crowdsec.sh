@@ -94,15 +94,8 @@ if [[ -f "$BOUNCER_CONFIG" ]]; then
     backup_file "$BOUNCER_CONFIG"
 fi
 
-sed -i "s/^api_key: .*/api_key: ${BOUNCER_KEY}/" "$BOUNCER_CONFIG"
+sed -i "s|^api_key: .*|api_key: ${BOUNCER_KEY}|" "$BOUNCER_CONFIG"
 
 log_info "API key for nftables bouncer added to $BOUNCER_CONFIG"
 
 systemctl enable --now crowdsec-firewall-bouncer
-
-if ! systemctl start crowdsec-firewall-bouncer; then
-    log_error "Failed to start CrowdSec firewall bouncer service"
-    systemctl status crowdsec-firewall-bouncer --no-pager
-else
-    log_success "CrowdSec and nftables bouncer configured successfully"
-fi
