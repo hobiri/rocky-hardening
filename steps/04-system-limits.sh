@@ -38,6 +38,11 @@ root soft nofile 4096
 root hard nofile 65536
 EOF
 
+# Limit SFTP users group to 5 concurrent logins
+# echo "# Limit SFTP users group to 5 concurrent logins" > /etc/security/limits.d/90-hobiri-security.conf
+# echo "@${SFTP_USERS_GROUP} hard maxlogins 5" >> /etc/security/limits.d/90-hobiri-security.conf
+# echo "@${SFTP_USERS_GROUP} soft maxlogins 4" >> /etc/security/limits.d/90-hobiri-security.conf
+
 cat > /etc/sysctl.d/90-hobiri-security.conf << EOF
 # Network Security
 net.ipv4.conf.all.rp_filter = 1

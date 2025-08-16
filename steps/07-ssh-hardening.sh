@@ -94,11 +94,14 @@ KexAlgorithms curve25519-sha256,curve25519-sha256@libssh.org,diffie-hellman-grou
 
 # SFTP Configuration for SFTP-only users
 Match Group $SFTP_USERS_GROUP
-ChrootDirectory /var/sftp/%u
-ForceCommand internal-sftp
-AllowTcpForwarding no
-X11Forwarding no
-PasswordAuthentication no
+    ChrootDirectory /var/sftp/%u
+    ForceCommand internal-sftp
+    AllowTcpForwarding no
+    X11Forwarding no
+    PasswordAuthentication yes
+    MaxSessions 5
+    ClientAliveInterval 600
+    ClientAliveCountMax 1
 
 # Banner
 Banner /etc/issue.net

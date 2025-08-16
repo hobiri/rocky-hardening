@@ -56,8 +56,6 @@ done
 # Install CrowdSec and nftables bouncer
 dnf install -y crowdsec crowdsec-firewall-bouncer-nftables
 
-# TODO: Be sure CrowdSec service starts after nftables
-
 # Configure CrowdSec
 systemctl enable --now crowdsec
 
@@ -66,4 +64,45 @@ if ! systemctl start crowdsec; then
     systemctl status crowdsec --no-pager
 else
     check_crowdsec_ready
+fi
+
+# Be sure CrowdSec service starts after nftables
+SERVICE_FILE="/usr/lib/systemd/system/crowdsec-firewall-bouncer.service"
+if grep -q '^After=.*nftables\.service' "$SERVICE_FILE"; then
+    log_info "nftables.service already present in After= directive"
+else
+    if grep -q '^After=' "$SERVICE_FILE"; then
+        sed -i '/^After=/ s/$/ nftables.service/' "$SERVICE_FILE"
+        log_info "Appended nftables.service to After= directive"
+    else
+        sed -i '/^\[Unit\]/a After=nftables.service' "$SERVICE_FILE"
+        log_info "Added After=nftables.service directive"
+    fi
+
+    systemctl daemon-reload
+fi
+
+# Generate API key for nftables bouncer and configure it
+BOUNCER_KEY=$(cscli bouncers add nftables-bouncer -o raw | tr -d '\n')
+if [[ -z "$BOUNCER_KEY" ]]; then
+    log_error "Failed to generate API key for nftables bouncer"
+    exit 1
+fi
+
+BOUNCER_CONFIG="/etc/crowdsec/bouncers/crowdsec-firewall-bouncer.yaml"
+if [[ -f "$BOUNCER_CONFIG" ]]; then
+    backup_file "$BOUNCER_CONFIG"
+fi
+
+sed -i "s/^api_key: .*/api_key: ${BOUNCER_KEY}/" "$BOUNCER_CONFIG"
+
+log_info "API key for nftables bouncer added to $BOUNCER_CONFIG"
+
+systemctl enable --now crowdsec-firewall-bouncer
+
+if ! systemctl start crowdsec-firewall-bouncer; then
+    log_error "Failed to start CrowdSec firewall bouncer service"
+    systemctl status crowdsec-firewall-bouncer --no-pager
+else
+    log_success "CrowdSec and nftables bouncer configured successfully"
 fi
