@@ -94,7 +94,8 @@ if [[ -f "$BOUNCER_CONFIG" ]]; then
     backup_file "$BOUNCER_CONFIG"
 fi
 
-sed -i "s#^api_key: .*|api_key: ${BOUNCER_KEY}|" "$BOUNCER_CONFIG"
+#sed -i "s#^api_key: .*|api_key: ${BOUNCER_KEY}|" "$BOUNCER_CONFIG"
+awk -v key="$BOUNCER_KEY" '/^api_key:/ {$2=key} 1' "$BOUNCER_CONFIG" > temp && mv temp "$BOUNCER_CONFIG"
 
 log_info "API key for nftables bouncer added to $BOUNCER_CONFIG"
 
