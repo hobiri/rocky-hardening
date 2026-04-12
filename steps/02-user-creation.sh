@@ -44,7 +44,7 @@ if ! id "$USER_NAME" &>/dev/null; then
         log_success "Added SSH public key for $USER_NAME"
     else
         cp -r /root/.ssh /home/$USER_NAME/
-        chwown -R $USER_NAME:$USER_GROUP" "$user_ssh_dir"
+        chown -R $USER_NAME:$USER_GROUP" "$user_ssh_dir"
     fi
  
     log_success "Created user: $USER_NAME"
