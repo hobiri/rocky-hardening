@@ -38,19 +38,19 @@ This script provides comprehensive security hardening for Rocky Linux 9 servers 
 
 1. **Download the script:**
 ```bash
-wget https://raw.githubusercontent.com/hobiri/rocky-hardening/main/install.sh
+curl -O https://raw.githubusercontent.com/hobiri/rocky-hardening/main/install.sh
 chmod +x install.sh
 ./install.sh
 ```
 
 2. **Run with default settings:**
 ```bash
-sudo ./rocky-hardening.sh
+./rocky-hardening.sh
 ```
 
 3. **Run with custom user:**
 ```bash
-sudo ./rocky-hardening.sh -u myuser -g mygroup
+./rocky-hardening.sh -u myuser -g mygroup
 ```
 
 ## Configuration Options
