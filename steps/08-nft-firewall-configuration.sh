@@ -46,7 +46,7 @@ table inet filter {
         ip6 nexthdr icmpv6 icmpv6 type { echo-request, echo-reply } limit rate 10/second accept
         
         # Allow SSH with rate limiting
-        tcp dport $SSH_PORT ct state new limit rate 3/minute accept
+        tcp dport $SSH_PORT ct state new limit rate 3/minute burst 10 packets accept
         
         # Allow HTTP/HTTPS
         tcp dport { 80, 443 } accept
