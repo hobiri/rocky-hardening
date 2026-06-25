@@ -164,7 +164,6 @@ sudo reboot
 ## File Locations
 
 ### Configuration Files
-- **User credentials**: `/root/user_credentials.txt`
 - **SSH config**: `/etc/ssh/sshd_config.d/50-hobiri-security.conf`
 - **nftables rules**: `/etc/nftables/main.nft`
 - **Security limits**: `/etc/security/limits.d/50-{username}.conf`
@@ -305,7 +304,6 @@ sudo systemctl status crowdsec-firewall-bouncer
 ### 🔍 Security Notes
 - Script creates backups of modified files with timestamps
 - All actions are logged to `/var/log/rocky-hardening-*.log`
-- Generated passwords are stored in `/root/user_credentials.txt`
 - Some changes require system reboot to take effect
 
 ### 📋 Compliance
