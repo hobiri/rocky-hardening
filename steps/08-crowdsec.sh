@@ -39,19 +39,24 @@ check_crowdsec_ready() {
 
 # Install CrowdSec repository
 RETRY_COUNT=3
+REPO_INSTALLED=false
 
 for i in $(seq 1 $RETRY_COUNT); do
     if curl -s --max-time 10 https://packagecloud.io &>/dev/null; then
-        curl -s https://packagecloud.io/install/repositories/crowdsec/crowdsec/script.rpm.sh | bash
+        curl -sSf "https://packagecloud.io/install/repositories/crowdsec/crowdsec/config_file.repo?os=rpm_any&dist=rpm_any&source=script" > "/etc/yum.repos.d/crowdsec_crowdsec.repo"
+        REPO_INSTALLED=true
         break
-    elif [[ $i -eq $RETRY_COUNT ]]; then
-        log_warning "CrowdSec repository unreachable. Skipping CrowdSec installation."
-        return 0
     else
         log_info "Repository unreachable, retrying in 10 seconds... ($i/$RETRY_COUNT)"
         sleep 10
     fi
 done
+
+# Check if the repository was installed successfully
+if [ "$REPO_INSTALLED" = false ]; then
+    log_warning "CrowdSec repository unreachable. Skipping CrowdSec installation."
+    exit 0
+fi
 
 # Install CrowdSec and nftables bouncer
 dnf install -y crowdsec crowdsec-firewall-bouncer-nftables
@@ -67,20 +72,17 @@ else
 fi
 
 # Be sure CrowdSec service starts after nftables
-SERVICE_FILE="/usr/lib/systemd/system/crowdsec-firewall-bouncer.service"
-if grep -q '^After=.*nftables\.service' "$SERVICE_FILE"; then
-    log_info "nftables.service already present in After= directive"
-else
-    if grep -q '^After=' "$SERVICE_FILE"; then
-        sed -i '/^After=/ s/$/ nftables.service/' "$SERVICE_FILE"
-        log_info "Appended nftables.service to After= directive"
-    else
-        sed -i '/^\[Unit\]/a After=nftables.service' "$SERVICE_FILE"
-        log_info "Added After=nftables.service directive"
-    fi
+BOUNCER_OVERRIDE_DIR="/etc/systemd/system/crowdsec-firewall-bouncer.service.d"
+mkdir -p "$BOUNCER_OVERRIDE_DIR"
+SERVICE_FILE="$BOUNCER_OVERRIDE_DIR/override.conf"
+cat << 'EOF' > "${BOUNCER_OVERRIDE_DIR}/override.conf"
+[Unit]
+After=nftables.service
+Requires=nftables.service
+EOF
 
-    systemctl daemon-reload
-fi
+systemctl daemon-reload
+log_info "Applied systemd drop-in override for crowdsec-firewall-bouncer"
 
 # Generate API key for nftables bouncer and configure it
 BOUNCER_KEY=$(cscli bouncers add nftables-bouncer -o raw | tr -d '\n')
