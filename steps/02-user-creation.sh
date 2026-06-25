@@ -64,4 +64,11 @@ usermod -aG wheel "$USER_NAME"
 echo "$USER_NAME ALL=(ALL) NOPASSWD:ALL" > "/etc/sudoers.d/50-${USER_NAME}"
 chmod 440 "/etc/sudoers.d/50-${USER_NAME}"
 
+# copy SSH keys from root to the new user if no public key is provided
+if [[ -z "${USER_PUB_KEY:-}" ]]; then
+    cp -r /root/.ssh /home/$USER_NAME/
+    chown -R $USER_NAME:$USER_GROUP "/home/$USER_NAME/.ssh"
+    log_info "Copied SSH keys from root to $USER_NAME"
+fi
+
 log_success "User added to sudoers with NOPASSWD"
