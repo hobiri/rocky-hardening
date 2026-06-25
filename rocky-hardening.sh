@@ -123,7 +123,6 @@ main() {
     echo
     echo -e "${YELLOW}Important Information:${NC}"
     echo -e "• User created: ${BLUE}$USER_NAME${NC}"
-    echo -e "• User password: ${BLUE}$USER_PASSWORD${NC}"
     echo -e "• SSH port changed to: ${BLUE}$SSH_PORT${NC}"
     echo -e "• SSH access group: ${BLUE}$SSH_USERS_GROUP${NC}"
     echo -e "• SFTP access group: ${BLUE}$SFTP_USERS_GROUP${NC}"
