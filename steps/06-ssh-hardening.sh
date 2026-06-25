@@ -64,6 +64,7 @@ MaxSessions 10
 PubkeyAuthentication yes
 AuthorizedKeysFile .ssh/authorized_keys
 PasswordAuthentication no
+KbdInteractiveAuthentication no
 PermitEmptyPasswords no
 ChallengeResponseAuthentication no
 KerberosAuthentication no

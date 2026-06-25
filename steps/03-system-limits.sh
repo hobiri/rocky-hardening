@@ -17,7 +17,7 @@ log_info "Step 4: Configuring system security limits"
 
 cat > /etc/security/limits.d/90-hobiri-security.conf << 'EOF'
 # Prevent fork bombs
-* hard nproc 1000
+* hard nproc 4096
 root hard nproc unlimited
 
 # Limit core dumps
@@ -32,9 +32,9 @@ root hard core unlimited
 * hard fsize 1000000
 
 # Maximum number of open files
-* soft nofile 4096
+* soft nofile 65536
 * hard nofile 65536
-root soft nofile 4096
+root soft nofile 65536
 root hard nofile 65536
 EOF
 
@@ -46,6 +46,7 @@ EOF
 cat > /etc/sysctl.d/90-hobiri-security.conf << EOF
 # Network Security
 net.core.bpf_jit_harden = 2
+net.core.somaxconn = 65535
 net.ipv4.conf.all.rp_filter = 1
 net.ipv4.conf.default.rp_filter = 1
 net.ipv4.conf.all.accept_redirects = 0
@@ -60,17 +61,26 @@ net.ipv4.tcp_syncookies = 1
 net.ipv4.tcp_max_syn_backlog = 2048
 net.ipv4.tcp_synack_retries = 2
 net.ipv4.tcp_syn_retries = 5
+net.ipv4.tcp_fin_timeout = 15
+net.ipv4.tcp_max_tw_buckets = 1440000
 net.ipv4.ip_forward = 0
-net.ipv6.conf.all.forwarding = 0
 EOF
+
+if [[ -n "${UNPRIVILEGED_PORT_START:-}" ]]; then
+    echo "net.ipv4.ip_unprivileged_port_start=${UNPRIVILEGED_PORT_START}" >> /etc/sysctl.d/90-hobiri-security.conf
+fi
 
 # Handle IPv6 disabling based on config.sh
 if [[ "${IPV6:-0}" == "0" ]]; then
+    echo 'net.ipv6.conf.all.forwarding = 0' >> /etc/sysctl.d/90-hobiri-security.conf
     echo 'net.ipv6.conf.all.disable_ipv6 = 1' >> /etc/sysctl.d/90-hobiri-security.conf
     echo 'net.ipv6.conf.default.disable_ipv6 = 1' >> /etc/sysctl.d/90-hobiri-security.conf
+    echo 'net.ipv6.conf.lo.disable_ipv6 = 1' >> /etc/sysctl.d/90-hobiri-security.conf
 else
+    echo 'net.ipv6.conf.all.forwarding = 0' >> /etc/sysctl.d/90-hobiri-security.conf
     echo 'net.ipv6.conf.all.disable_ipv6 = 0' >> /etc/sysctl.d/90-hobiri-security.conf
     echo 'net.ipv6.conf.default.disable_ipv6 = 0' >> /etc/sysctl.d/90-hobiri-security.conf
+    echo 'net.ipv6.conf.lo.disable_ipv6 = 0' >> /etc/sysctl.d/90-hobiri-security.conf
 fi
 
 # Additional security parameters
@@ -83,8 +93,8 @@ kernel.kptr_restrict = 2
 kernel.perf_event_paranoid = 3
 kernel.unprivileged_bpf_disabled = 1
 # System Limits
-fs.file-max = 65535
-kernel.pid_max = 65535
+fs.file-max = 2097152
+kernel.pid_max = 4194304
 EOF
 
 sysctl -p /etc/sysctl.d/90-hobiri-security.conf
