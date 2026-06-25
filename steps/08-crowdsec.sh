@@ -97,7 +97,9 @@ if [[ -f "$BOUNCER_CONFIG" ]]; then
 fi
 
 #sed -i "s#^api_key: .*|api_key: ${BOUNCER_KEY}|" "$BOUNCER_CONFIG"
-awk -v key="$BOUNCER_KEY" '/^api_key:/ {$2=key} 1' "$BOUNCER_CONFIG" > temp && mv temp "$BOUNCER_CONFIG"
+awk -v key="$BOUNCER_KEY" '/^api_key:/ {$2=key} 1' "$BOUNCER_CONFIG" > "${BOUNCER_CONFIG}.tmp"
+cat "${BOUNCER_CONFIG}.tmp" > "$BOUNCER_CONFIG"
+rm "${BOUNCER_CONFIG}.tmp"
 
 log_info "API key for nftables bouncer added to $BOUNCER_CONFIG"
 

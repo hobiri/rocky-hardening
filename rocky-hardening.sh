@@ -14,7 +14,7 @@
 
 set -euo pipefail
 
-VERSION="1.0.0"
+VERSION="1.10.0"
 
 # Load config and helpers once
 source ./config.sh
@@ -103,21 +103,19 @@ main() {
 
     # Final system configuration
     log_info "Step 99: Final system configuration and cleanup"
-    
+
     # Set secure umask for all users
     echo "umask 077" >> /etc/bashrc
     echo "umask 077" >> /etc/profile
-    
+
     # Update system one more time
     dnf update -y
-    
+
     # Generate final report
     log_info "Generating final security report..."
     /usr/local/bin/security-compliance-check.sh
-    
+
     log_success "Rocky Linux 9 security hardening completed successfully!"
-    
-    USER_PASSWORD=$(grep "Password:" /root/user_credentials.txt | cut -d' ' -f2)
 
     echo -e "\n${GREEN}========================================${NC}"
     echo -e "${GREEN}    HARDENING COMPLETED SUCCESSFULLY   ${NC}"
