@@ -51,10 +51,6 @@ rollback_changes() {
     esac
 }
 
-generate_random_password() {
-    openssl rand -base64 32 | tr -d "=+/" | cut -c1-20
-}
-
 check_root() {
     if [[ $EUID -ne 0 ]]; then
         log_error "This script must be run as root"
