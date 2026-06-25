@@ -88,19 +88,18 @@ main() {
 
     ./steps/01-system-update.sh
     ./steps/02-user-creation.sh
-    ./steps/03-kernel-hardening.sh
-    ./steps/04-system-limits.sh
-    ./steps/05-password-policies.sh
-    ./steps/06-pam-security.sh
-    ./steps/07-ssh-hardening.sh
-    ./steps/08-nft-firewall-configuration.sh
-    ./steps/09-crowdsec.sh
-    ./steps/10-selinux-enforcing.sh
-    ./steps/11-system-auditing.sh
-    ./steps/12-services-purge.sh
-    ./steps/13-secure-time-sync.sh
-    ./steps/14-filesystem-security.sh
-    ./steps/15-security-monitoring.sh
+    ./steps/03-system-limits.sh
+    ./steps/04-password-policies.sh
+    ./steps/05-pam-security.sh
+    ./steps/06-ssh-hardening.sh
+    ./steps/07-nft-firewall-configuration.sh
+    ./steps/08-crowdsec.sh
+    ./steps/09-selinux-enforcing.sh
+    ./steps/10-system-auditing.sh
+    ./steps/11-services-purge.sh
+    ./steps/12-secure-time-sync.sh
+    ./steps/13-filesystem-security.sh
+    ./steps/14-security-monitoring.sh
 
     # Final system configuration
     log_info "Step 99: Final system configuration and cleanup"
@@ -130,7 +129,6 @@ main() {
     echo -e "• SSH port changed to: ${BLUE}$SSH_PORT${NC}"
     echo -e "• SSH access group: ${BLUE}$SSH_USERS_GROUP${NC}"
     echo -e "• SFTP access group: ${BLUE}$SFTP_USERS_GROUP${NC}"
-    echo -e "• Credentials saved to: ${BLUE}/root/user_credentials.txt${NC}"
     echo -e "• Log file: ${BLUE}$LOGFILE${NC}"
     echo
     echo -e "${RED}IMPORTANT:${NC} System will require reboot to apply all kernel security parameters."

@@ -45,6 +45,7 @@ EOF
 
 cat > /etc/sysctl.d/90-hobiri-security.conf << EOF
 # Network Security
+net.core.bpf_jit_harden = 2
 net.ipv4.conf.all.rp_filter = 1
 net.ipv4.conf.default.rp_filter = 1
 net.ipv4.conf.all.accept_redirects = 0
