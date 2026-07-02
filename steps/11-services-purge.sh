@@ -13,9 +13,10 @@ source "${SCRIPT_DIR}/config.sh"
 source "${SCRIPT_DIR}/helpers.sh"
 
 # 11. Disable unnecessary services
-log_info "Step 11: Disabling unnecessary services"
+log_info "Step 11: Executing final system lockdown"
 
 SERVICES_TO_DISABLE="avahi-daemon cups bluetooth kdump"
+
 for service in $SERVICES_TO_DISABLE; do
     systemctl disable --now "$service" 2>/dev/null || true
 done
@@ -30,4 +31,13 @@ install tipc /bin/true
 EOF
     
 log_success "Disabled unnecessary services and protocols"
-    
+
+if selinuxenabled; then
+    log_info "Enforcing strict SELinux booleans..."
+
+    setsebool -P deny_execmem on
+    setsebool -P secure_mode_insmod on
+    setsebool -P ssh_sysadm_login off
+
+    log_success "SELinux booleans locked down"
+fi

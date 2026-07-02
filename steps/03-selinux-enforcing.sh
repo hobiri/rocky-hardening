@@ -28,11 +28,6 @@ sed -i 's/SELINUX=disabled/SELINUX=enforcing/' /etc/selinux/config
 # Install SELinux tools
 dnf install -y setools-console policycoreutils-python-utils setroubleshoot-server
 
-# Set secure SELinux booleans
-setsebool -P deny_execmem on
-setsebool -P secure_mode_insmod on
-setsebool -P ssh_sysadm_login off
-
 # Configure SSH port in SELinux (Idempotent and safe approach)
 SELINUX_STATUS="Disabled"
 
