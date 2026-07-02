@@ -22,12 +22,14 @@ if ! getent group "$USER_GROUP" > /dev/null 2>&1; then
     log_info "Created group: $USER_GROUP"
 fi
 
+user_home_dir="${USER_HOME:-/home/$USER_NAME}"
+
 # Create user
 if ! id "$USER_NAME" &>/dev/null; then
-    useradd -m -g "$USER_GROUP" -s /bin/bash "$USER_NAME"
+    useradd -m -g "$USER_GROUP" -d "$user_home_dir" -s /bin/bash "$USER_NAME"
 
     if [[ -n "${USER_PUB_KEY:-}" ]]; then
-        user_ssh_dir="/home/$USER_NAME/.ssh"
+        user_ssh_dir="$user_home_dir/.ssh"
 
         mkdir -p "$user_ssh_dir"
         
@@ -39,8 +41,8 @@ if ! id "$USER_NAME" &>/dev/null; then
         
         log_success "Added SSH public key for $USER_NAME"
     else
-        cp -r /root/.ssh /home/$USER_NAME/
-        chown -R "$USER_NAME:$USER_GROUP" "/home/$USER_NAME/.ssh"
+        cp -r /root/.ssh "$user_home_dir/"
+        chown -R "$USER_NAME:$USER_GROUP" "$user_home_dir/.ssh"
 
         log_info "Copied SSH keys from root to $USER_NAME"
     fi
@@ -56,7 +58,7 @@ fi
 usermod -aG wheel "$USER_NAME"
 
 # Configure sudo without password for the user
-echo "$USER_NAME ALL=(ALL) NOPASSWD:ALL" > "/etc/sudoers.d/50-${USER_NAME}"
-chmod 440 "/etc/sudoers.d/50-${USER_NAME}"
+echo "$USER_NAME ALL=(ALL) NOPASSWD:ALL" > "/etc/sudoers.d/${USER_NAME}"
+chmod 440 "/etc/sudoers.d/${USER_NAME}"
 
 log_success "User added to sudoers with NOPASSWD"

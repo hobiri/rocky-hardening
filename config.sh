@@ -2,12 +2,13 @@
 
 USER_NAME="admin"               # Username
 USER_GROUP=$USER_NAME           # User group
+USER_HOME="/home/$USER_NAME"    # User home directory
 USER_PUB_KEY=""                 # SSH public key for user (optional)
 IPV6="0"                        # Set to "1" to enable IPv6
 SSH_PORT="2222"                 # Default SSH port
 SSH_USERS_GROUP="ssh-users"     # Group for SSH users
 SFTP_USERS_GROUP="sftp-users"   # Group for SFTP users
-UNPRIVILEGED_PORT_START="80"    # Unprivileged port start (default: 80)
+#UNPRIVILEGED_PORT_START="80"   # Unprivileged port start (default: 80)
 
 # Logging
 TIMESTAMP=$(date +%Y%m%d_%H%M%S)
