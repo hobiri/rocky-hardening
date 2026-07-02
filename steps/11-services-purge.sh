@@ -12,8 +12,8 @@ fi
 source "${SCRIPT_DIR}/config.sh"
 source "${SCRIPT_DIR}/helpers.sh"
 
-# 12. Disable unnecessary services
-log_info "Step 12: Disabling unnecessary services"
+# 11. Disable unnecessary services
+log_info "Step 11: Disabling unnecessary services"
 
 SERVICES_TO_DISABLE="avahi-daemon cups bluetooth kdump"
 for service in $SERVICES_TO_DISABLE; do

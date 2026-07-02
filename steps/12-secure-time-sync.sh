@@ -12,8 +12,8 @@ fi
 source "${SCRIPT_DIR}/config.sh"
 source "${SCRIPT_DIR}/helpers.sh"
 
-# 13. Configure secure time synchronization
-log_info "Step 13: Configuring secure time synchronization"
+# 12. Configure secure time synchronization
+log_info "Step 12: Configuring secure time synchronization"
 
 dnf install -y chrony
 

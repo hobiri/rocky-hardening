@@ -12,8 +12,8 @@ fi
 source "${SCRIPT_DIR}/config.sh"
 source "${SCRIPT_DIR}/helpers.sh"
 
-# 14. File system security
-log_info "Step 14: Securing file system permissions"
+# 13. File system security
+log_info "Step 13: Securing file system permissions"
 
 # Find and fix world-writable files (limit to avoid long execution)
 find /usr /etc /bin /sbin -xdev -type f -perm -0002 -exec chmod o-w {} \; 2>/dev/null | head -100

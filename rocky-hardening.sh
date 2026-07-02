@@ -88,13 +88,13 @@ main() {
 
     ./steps/01-system-update.sh
     ./steps/02-user-creation.sh
-    ./steps/03-system-limits.sh
-    ./steps/04-password-policies.sh
-    ./steps/05-pam-security.sh
-    ./steps/06-ssh-hardening.sh
-    ./steps/07-nft-firewall-configuration.sh
-    ./steps/08-crowdsec.sh
-    ./steps/09-selinux-enforcing.sh
+    ./steps/03-selinux-enforcing.sh
+    ./steps/04-system-limits.sh
+    ./steps/05-password-policies.sh
+    ./steps/06-pam-security.sh
+    ./steps/07-ssh-hardening.sh
+    ./steps/08-nft-firewall-configuration.sh
+    ./steps/09-crowdsec.sh
     ./steps/10-system-auditing.sh
     ./steps/11-services-purge.sh
     ./steps/12-secure-time-sync.sh

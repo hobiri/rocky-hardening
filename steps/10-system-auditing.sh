@@ -12,8 +12,8 @@ fi
 source "${SCRIPT_DIR}/config.sh"
 source "${SCRIPT_DIR}/helpers.sh"
 
-# 11. Configure auditd
-log_info "Step 11: Configuring system auditing"
+# 10. Configure auditd
+log_info "Step 10: Configuring system auditing"
 
 dnf install -y audit
 

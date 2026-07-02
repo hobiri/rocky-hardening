@@ -12,8 +12,8 @@ fi
 source "${SCRIPT_DIR}/config.sh"
 source "${SCRIPT_DIR}/helpers.sh"
 
-# 15. Create security monitoring scripts
-log_info "Step 15: Creating security monitoring scripts"
+# 14. Create security monitoring scripts
+log_info "Step 14: Creating security monitoring scripts"
 
 # Create security compliance check script
 cat > /usr/local/bin/security-compliance-check.sh << 'EOF'
