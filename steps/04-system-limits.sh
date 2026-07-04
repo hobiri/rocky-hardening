@@ -87,7 +87,7 @@ fi
 cat >> /etc/sysctl.d/90-hobiri-security.conf << 'EOF'
 # Kernel Security
 kernel.dmesg_restrict = 1
-kernel.yama.ptrace_scope = 3
+kernel.yama.ptrace_scope = 2
 kernel.kexec_load_disabled = 1
 kernel.kptr_restrict = 2
 kernel.perf_event_paranoid = 3
