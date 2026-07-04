@@ -14,7 +14,7 @@
 
 set -euo pipefail
 
-VERSION="1.10.0"
+VERSION="1.10.3"
 
 # Load config and helpers once
 source ./config.sh
@@ -25,42 +25,14 @@ usage() {
 Usage: $0 [OPTIONS]
 
 Options:
-    -n, --name NAME             Set custom user name (default: hobot)
-    -g, --group GROUP           Set custom user group (default: same as user name)
-    -p, --port PORT             Set custom SSH port (default: 2222)
-    -i, --ipv6                  Enable IPv6 support (default: disabled)
     -h, --help                  Show this help message
 
-Examples:
-    $0                          # Use default settings
-    $0 -n myuser -g mygroup     # Custom user and group
-    
 EOF
 }
 
 # Parse command line arguments
 while [[ $# -gt 0 ]]; do
     case $1 in
-        -n|--name)
-            USER_NAME="$2"
-            shift 2
-            ;;
-        -g|--group)
-            USER_GROUP="$2"
-            shift 2
-            ;;
-        -p|--port)
-            SSH_PORT="$2"
-            if ! [[ "$SSH_PORT" =~ ^[0-9]+$ ]] || (( SSH_PORT < 1 || SSH_PORT > 65535 )); then
-                log_error "Invalid SSH port: $SSH_PORT. Must be between 1 and 65535."
-                exit 1
-            fi
-            shift 2
-            ;;
-        -i|--ipv6)
-            IPV6="1"
-            shift
-            ;;
         -h|--help)
             usage
             exit 0
@@ -82,7 +54,6 @@ main() {
     # Get user input for customization
     echo
     log_info "Starting Rocky Linux 9 hardening process..."
-    log_info "Log file: $LOGFILE"
 
     check_root
 
@@ -115,7 +86,7 @@ main() {
     log_info "Generating final security report..."
     /usr/local/bin/security-compliance-check.sh
 
-    log_success "Rocky Linux 9 security hardening completed successfully!"
+    log_success "Rocky Linux security hardening completed successfully!"
 
     echo -e "\n${GREEN}========================================${NC}"
     echo -e "${GREEN}    HARDENING COMPLETED SUCCESSFULLY   ${NC}"
@@ -126,7 +97,6 @@ main() {
     echo -e "• SSH port changed to: ${BLUE}$SSH_PORT${NC}"
     echo -e "• SSH access group: ${BLUE}$SSH_USERS_GROUP${NC}"
     echo -e "• SFTP access group: ${BLUE}$SFTP_USERS_GROUP${NC}"
-    echo -e "• Log file: ${BLUE}$LOGFILE${NC}"
     echo
     echo -e "${RED}IMPORTANT:${NC} System will require reboot to apply all kernel security parameters."
     echo -e "${RED}WARNING:${NC} Make sure to test SSH connectivity on port $SSH_PORT before rebooting!"
