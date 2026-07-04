@@ -26,8 +26,9 @@ cat > /etc/modprobe.d/disable-protocols.conf << 'EOF'
 # Disable rare network protocols
 install dccp /bin/true
 install sctp /bin/true
-install rds /bin/true
-install tipc /bin/true
+# rds and tipc can break NVMe/RAID drivers on some systems
+# install rds /bin/true
+# install tipc /bin/true
 EOF
     
 log_success "Disabled unnecessary services and protocols"
@@ -36,7 +37,7 @@ if selinuxenabled; then
     log_info "Enforcing strict SELinux booleans..."
 
     setsebool -P deny_execmem on
-    setsebool -P secure_mode_insmod on
+    # setsebool -P secure_mode_insmod on # Disabled to avoid boot issues
     setsebool -P ssh_sysadm_login off
 
     log_success "SELinux booleans locked down"
