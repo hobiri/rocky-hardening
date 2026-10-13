@@ -49,7 +49,7 @@ fix_ssh_home_security() {
         if command -v semanage >/dev/null 2>&1; then
             # Escape regex metacharacters (dots) in the home path
             local home_re="${home_dir//./\\.}"
-            semanage fcontext -a -t ssh_home_t "${home_re}/\.ssh(/.*)?" 2>/dev/null || true
+            semanage fcontext -a -t ssh_home_t "${home_re}(/.*)?" 2>/dev/null || true
             restorecon -R -v "$ssh_dir" 2>/dev/null || true
         else
             log_warning "semanage not found: $ssh_dir may keep a wrong SELinux label"
