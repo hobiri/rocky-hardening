@@ -1,6 +1,6 @@
-# Hobiri Security Hardening Script - Rocky Linux 9 edition
+# Hobiri Security Hardening Script - Rocky Linux 10 edition
 
-This script provides comprehensive security hardening for Rocky Linux 9 servers based on industry best practices and security guidelines.
+This script provides comprehensive security hardening for Rocky Linux 10 servers based on industry best practices and security guidelines.
 
 ## Features
 
@@ -354,6 +354,9 @@ myuser hard nproc 500
 This project is licensed under the MIT License - see the LICENSE file for details.
 
 ## Changelog
+
+### Version 1.10
+- Rocky Linux 10 compatibility
 
 ### Version 1.0
 - Initial release
