@@ -17,8 +17,18 @@ log_info "Step 10: Configuring system auditing"
 
 dnf install -y audit
 
+# On RHEL/Rocky 10 the rules directory (and auditctl/augenrules) moved from the
+# 'audit' package to the 'audit-rules' subpackage, so installing 'audit' alone
+# leaves /etc/audit/rules.d missing. Make sure it exists on every release.
+if [[ ! -d /etc/audit/rules.d ]]; then
+    dnf install -y audit-rules 2>/dev/null || log_warning "audit-rules package not available"
+
+    mkdir -p /etc/audit/rules.d
+fi
+
 # Configure audit rules
-cat > /etc/audit/rules.d/security.rules << 'EOF'
+{
+cat << 'EOF'
 # Delete existing rules
 -D
 
@@ -54,10 +64,18 @@ cat > /etc/audit/rules.d/security.rules << 'EOF'
 -w /etc/issue -p wa -k system-locale
 -w /etc/issue.net -p wa -k system-locale
 -w /etc/hosts -p wa -k system-locale
+EOF
 
-# Monitor login/logout events
--w /var/log/faillog -p wa -k logins
--w /var/log/lastlog -p wa -k logins
+# Monitor login/logout events. Watch rules must target existing files:
+# auditctl/augenrules fail on missing paths and /var/log/faillog and
+# /var/log/lastlog are not present on every release.
+for logfile in /var/log/faillog /var/log/lastlog; do
+    if [[ -e "$logfile" ]]; then
+        echo "-w $logfile -p wa -k logins"
+    fi
+done
+
+cat << 'EOF'
 
 # Monitor file deletion
 -a always,exit -F arch=b64 -S unlink -S unlinkat -S rename -S renameat -F auid>=1000 -F auid!=4294967295 -k delete
@@ -72,6 +90,7 @@ cat > /etc/audit/rules.d/security.rules << 'EOF'
 # Make configuration immutable
 -e 2
 EOF
-    
+} > /etc/audit/rules.d/security.rules
+
 systemctl enable --now auditd
 log_success "System auditing configured"
