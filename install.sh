@@ -20,6 +20,6 @@ rm -f "$FILENAME"
 echo "Setting permissions..."
 cd "rocky-hardening-${VERSION}"
 chmod +x rocky-hardening.sh
-chmod +x steps/*
+find extras scripts steps -name '*.sh' -exec chmod +x {} + 2>/dev/null || true
 
 echo "Complete!"

@@ -128,6 +128,19 @@ chmod +x install.sh
 - Tracks user activities and system calls
 - Logs security-relevant events
 
+## Extras
+
+Optional helper scripts that are **not** executed by `rocky-hardening.sh`.
+
+### Rocky Linux 10 SIG Core Infra repository
+
+```bash
+sudo ./extras/sig-core-repo.sh
+```
+
+Adds the `rocky-core-infra` repository to `/etc/yum.repos.d/rocky-core-infra.repo`,
+imports its GPG key, and refreshes the repository metadata.
+
 ## Post-Installation Steps
 
 ### 1. Verify SSH Access
